@@ -41,18 +41,66 @@ export default function ReviewPage() {
     setIsLoading(true)
 
     try {
-      // In a real app, you would send this data to your backend
+      // Stock check before placing order
+      for (const item of items) {
+        try {
+          const response = await fetch(`/api/products?search=${encodeURIComponent(item.slug)}&limit=1`)
+          const data = await response.json()
+
+          if (!response.ok || data.total === 0 || !data.products || data.products.length === 0) {
+            toast({
+              title: "Stock Check Error",
+              description: `Could not verify stock for ${item.name}. Please remove it or try again.`,
+              variant: "destructive",
+            })
+            setIsLoading(false)
+            return
+          }
+
+          const productFromApi = data.products[0]
+
+          // Verify if the fetched product is the correct one
+          if (productFromApi.id !== item.id || productFromApi.slug !== item.slug) {
+            toast({
+              title: "Stock Check Mismatch",
+              description: `Details for ${item.name} don't match. Please review your cart or try again.`,
+              variant: "destructive",
+            })
+            setIsLoading(false)
+            return;
+          }
+
+          if (item.quantity > productFromApi.stock) {
+            toast({
+              title: "Insufficient Stock",
+              description: `${item.name} has only ${productFromApi.stock} available. Please reduce quantity or remove from cart.`,
+              variant: "destructive",
+            })
+            // Consider router.push('/cart') for better UX
+            setIsLoading(false)
+            return
+          }
+        } catch (apiError) {
+          console.error("API error during stock check:", apiError)
+          toast({
+            title: "Network Error",
+            description: `Failed to verify stock for ${item.name} due to a network issue. Please try again.`,
+            variant: "destructive",
+          })
+          setIsLoading(false)
+          return
+        }
+      }
+
+      // If all stock checks pass, proceed to create order
       const order = await createOrder({
         items,
         shippingInfo,
         paymentInfo,
       })
 
-      // Store order ID for confirmation page
       localStorage.setItem("orderId", order.id)
       localStorage.setItem("orderTotal", order.total)
-
-      // Clear cart and checkout data
       clearCart()
 
       toast({
@@ -63,9 +111,11 @@ export default function ReviewPage() {
 
       router.push("/checkout/confirmation")
     } catch (error) {
+      // This catch is for errors from createOrder or other general errors after stock check
+      console.error("Error placing order:", error)
       toast({
         title: "Error placing order",
-        description: "There was an error placing your order. Please try again.",
+        description: "There was an unexpected error placing your order. Please try again.",
         variant: "destructive",
       })
     } finally {

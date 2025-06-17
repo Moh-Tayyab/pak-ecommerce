@@ -1,11 +1,33 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16", // Use the latest API version
-})
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+let stripe: Stripe | null = null
+
+if (stripeSecretKey) {
+  stripe = new Stripe(stripeSecretKey, {
+    apiVersion: "2023-10-16",
+  })
+} else {
+  console.warn("********************************************************************************")
+  console.warn("WARNING: STRIPE_SECRET_KEY is not set. Stripe functionality will not work.")
+  console.warn("For build purposes, a placeholder key will be used if absolutely necessary,")
+  console.warn("but API calls requiring Stripe will likely fail or be mocked.")
+  console.warn("Ensure STRIPE_SECRET_KEY is set in your environment for production/testing.")
+  console.warn("********************************************************************************")
+  // No fake key initialization here, stripe remains null.
+  // The POST handler will check for null.
+}
 
 export async function POST(request: Request) {
+  if (!stripe) {
+    console.error("Stripe is not initialized due to missing STRIPE_SECRET_KEY.")
+    return NextResponse.json(
+      { error: "Stripe is not configured. Payment processing unavailable." },
+      { status: 500 },
+    )
+  }
+
   try {
     const body = await request.json()
     const { items, orderId, customerEmail } = body

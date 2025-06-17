@@ -28,24 +28,44 @@ export default function AddToCartButton({
     setIsAdding(true)
 
     try {
-      addItem({
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        price: product.pricePKR,
-        image: product.imageUrls[0],
-        quantity,
-        options: selectedOptions,
+      const response = await fetch("/api/products", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity: quantity,
+        }),
       })
 
-      toast({
-        title: "Added to cart",
-        description: `${product.name} has been added to your cart.`,
-      })
+      if (response.ok) {
+        addItem({
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          price: product.pricePKR,
+          image: product.imageUrls[0],
+          quantity,
+          options: selectedOptions,
+        })
+
+        toast({
+          title: "Added to cart",
+          description: `${product.name} has been added to your cart.`,
+        })
+      } else {
+        const errorData = await response.json()
+        toast({
+          title: "Error adding to cart",
+          description: errorData.error || "Failed to add item to cart.",
+          variant: "destructive",
+        })
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add item to cart.",
+        description: "An unexpected network error occurred. Please try again.",
         variant: "destructive",
       })
     } finally {

@@ -31,12 +31,42 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export async function generateStaticParams() {
-  // In a real app, you might want to limit this to the most popular products
-  // and use fallback: 'blocking' for the rest
-  const products = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`).then((res) => res.json())
-  return products.map((product: any) => ({
-    slug: product.slug,
-  }))
+  const apiUrlBase = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrlBase) {
+    console.warn("********************************************************************************");
+    console.warn("WARNING: NEXT_PUBLIC_API_URL is not set for generateStaticParams in product/[slug] page.");
+    console.warn("API calls during build will attempt to use relative paths.");
+    console.warn("Ensure NEXT_PUBLIC_API_URL is set if absolute URLs are required during build or for external API.");
+    console.warn("********************************************************************************");
+  }
+
+  try {
+    const response = await fetch(`${apiUrlBase || ""}/api/products?limit=100`); // Added limit, adjust as needed
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch products for generateStaticParams: ${response.status} ${response.statusText}`,
+      );
+      return []; // Return empty array on fetch error to prevent build crash
+    }
+
+    const productsData = await response.json();
+    const productList = productsData.products; // API returns { products: [], total: ... }
+
+    if (!Array.isArray(productList)) {
+      console.error(
+        "generateStaticParams: Product list fetched is not an array or is in an unexpected format.",
+        productList,
+      );
+      return []; // Return empty array if data format is wrong
+    }
+
+    return productList.map((product: any) => ({
+      slug: product.slug,
+    }));
+  } catch (error) {
+    console.error("Error in generateStaticParams while fetching products:", error);
+    return []; // Return empty array on any other error
+  }
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {

@@ -187,3 +187,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to create product" }, { status: 500 })
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { productId, quantity } = body
+
+    if (!productId || quantity === undefined) {
+      return NextResponse.json({ success: false, error: "Missing productId or quantity" }, { status: 400 })
+    }
+
+    const productIndex = products.findIndex((p) => p.id === productId)
+
+    if (productIndex === -1) {
+      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 })
+    }
+
+    const product = products[productIndex]
+
+    if (product.stock >= quantity) {
+      product.stock -= quantity
+      products[productIndex] = product
+      return NextResponse.json({ success: true, product })
+    } else {
+      return NextResponse.json({ success: false, error: "Insufficient stock" }, { status: 400 })
+    }
+  } catch (error) {
+    return NextResponse.json({ success: false, error: "Failed to update product stock" }, { status: 500 })
+  }
+}
