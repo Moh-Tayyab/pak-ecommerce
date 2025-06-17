@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-context"
 import CheckoutProgress from "@/components/checkout/CheckoutProgress"
 import OrderSummary from "@/components/checkout/OrderSummary"
 import { createOrder } from "@/lib/api"
+import { Loader2 } from "lucide-react"
 
 export default function ReviewPage() {
   const router = useRouter()
@@ -89,6 +90,24 @@ export default function ReviewPage() {
     return <div className="container mx-auto px-4 py-8">Loading...</div>
   }
 
+  // Helper function to get payment method display name
+  const getPaymentMethodName = (method: string) => {
+    switch (method) {
+      case "card":
+        return "Credit/Debit Card"
+      case "cod":
+        return "Cash on Delivery"
+      case "easypaisa":
+        return "EasyPaisa"
+      case "jazzcash":
+        return "JazzCash"
+      case "stripe":
+        return "Stripe"
+      default:
+        return method
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <CheckoutProgress currentStep="review" />
@@ -111,11 +130,16 @@ export default function ReviewPage() {
 
             <h2 className="text-xl font-semibold mt-6 mb-4">Payment Method</h2>
             <div className="bg-muted p-4 rounded-lg">
-              {paymentInfo.paymentMethod === "card" ? (
-                <p>Credit/Debit Card (ending in {paymentInfo.cardNumber?.slice(-4) || "****"})</p>
-              ) : (
-                <p>Cash on Delivery</p>
+              <p className="font-medium">{getPaymentMethodName(paymentInfo.method)}</p>
+
+              {paymentInfo.method === "card" && paymentInfo.cardDetails && (
+                <p>Card ending in {paymentInfo.cardDetails.number.slice(-4)}</p>
               )}
+
+              {(paymentInfo.method === "easypaisa" || paymentInfo.method === "jazzcash") &&
+                paymentInfo.mobileWallet && <p>Phone: {paymentInfo.mobileWallet.phoneNumber}</p>}
+
+              {paymentInfo.method === "cod" && <p>Payment will be collected upon delivery</p>}
             </div>
           </div>
 
@@ -126,7 +150,13 @@ export default function ReviewPage() {
 
         <div className="mt-8">
           <Button onClick={handlePlaceOrder} className="w-full" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Place Order"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+              </>
+            ) : (
+              "Place Order"
+            )}
           </Button>
         </div>
       </div>

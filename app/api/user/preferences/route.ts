@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
+import { getServerSession } from "next-auth"
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest) {
 
     // In a real app, you would save preferences to your database
     // For now, just return success
-    console.log("Saving preferences for user:", session.user.email, preferences)
+    console.log("Saving preferences for user:", session.user.id, preferences)
 
     return NextResponse.json({ success: true })
   } catch (error) {

@@ -54,7 +54,7 @@ export interface Review {
   createdAt: string
 }
 
-// Mock data
+// Static data that doesn't change
 const categories: Category[] = [
   {
     id: "cat1",
@@ -118,226 +118,16 @@ const brands: Brand[] = [
   { id: "brand8", name: "Anker", slug: "anker", logoUrl: "/placeholder.svg?height=100&width=100" },
 ]
 
-const products: Product[] = [
-  {
-    id: "prod1",
-    slug: "iphone-13-pro-max",
-    name: "iPhone 13 Pro Max",
-    description:
-      "The iPhone 13 Pro Max features a 6.7-inch Super Retina XDR display with ProMotion, A15 Bionic chip, and a pro camera system that enables impressive low-light photography.",
-    category: "smartphones",
-    brand: "apple",
-    pricePKR: 249999,
-    discountPercentage: 5,
-    rating: 4.8,
-    reviewCount: 124,
-    imageUrls: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-    stock: 15,
-    sku: "APIP13PM-128",
-    specifications: {
-      display: "6.7-inch Super Retina XDR display with ProMotion",
-      processor: "A15 Bionic chip",
-      camera: "Pro 12MP camera system: Telephoto, Wide, and Ultra Wide",
-      battery: "Up to 28 hours video playback",
-      storage: "128GB",
-      os: "iOS 15",
-      dimensions: "160.8 x 78.1 x 7.65 mm",
-      weight: "238 grams",
-    },
-    createdAt: "2023-01-15T08:00:00Z",
-    isFeatured: true,
-    options: [
-      {
-        name: "Storage",
-        values: ["128GB", "256GB", "512GB", "1TB"],
-      },
-      {
-        name: "Color",
-        values: ["Graphite", "Gold", "Silver", "Sierra Blue"],
-      },
-    ],
-  },
-  {
-    id: "prod2",
-    slug: "samsung-galaxy-s21-ultra",
-    name: "Samsung Galaxy S21 Ultra",
-    description:
-      "The Galaxy S21 Ultra features a stunning 6.8-inch Dynamic AMOLED 2X display, powerful Exynos 2100 processor, and a versatile quad camera system with 100x Space Zoom.",
-    category: "smartphones",
-    brand: "samsung",
-    pricePKR: 199999,
-    discountPercentage: 10,
-    rating: 4.7,
-    reviewCount: 98,
-    imageUrls: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-    stock: 8,
-    sku: "SGGS21U-256",
-    specifications: {
-      display: "6.8-inch Dynamic AMOLED 2X display",
-      processor: "Exynos 2100",
-      camera: "108MP wide, 12MP ultra-wide, 10MP telephoto with 3x optical zoom, 10MP telephoto with 10x optical zoom",
-      battery: "5000mAh",
-      storage: "256GB",
-      os: "Android 11",
-      dimensions: "165.1 x 75.6 x 8.9 mm",
-      weight: "227 grams",
-    },
-    createdAt: "2023-02-10T10:30:00Z",
-    isFeatured: true,
-    options: [
-      {
-        name: "Storage",
-        values: ["128GB", "256GB", "512GB"],
-      },
-      {
-        name: "Color",
-        values: ["Phantom Black", "Phantom Silver", "Phantom Titanium", "Phantom Navy", "Phantom Brown"],
-      },
-    ],
-  },
-  {
-    id: "prod3",
-    slug: "macbook-pro-14",
-    name: "MacBook Pro 14-inch",
-    description:
-      "The 14-inch MacBook Pro features an M1 Pro chip, stunning Liquid Retina XDR display, and all-day battery life, making it perfect for professionals and creatives.",
-    category: "laptops",
-    brand: "apple",
-    pricePKR: 349999,
-    discountPercentage: 0,
-    rating: 4.9,
-    reviewCount: 76,
-    imageUrls: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-    stock: 5,
-    sku: "APMB14-512",
-    specifications: {
-      display: "14.2-inch Liquid Retina XDR display",
-      processor: "Apple M1 Pro chip",
-      memory: "16GB unified memory",
-      storage: "512GB SSD",
-      graphics: "14-core GPU",
-      battery: "Up to 17 hours",
-      ports: "3 Thunderbolt 4 ports, HDMI port, SDXC card slot, MagSafe 3 port",
-      os: "macOS Monterey",
-    },
-    createdAt: "2023-03-05T14:15:00Z",
-    isFeatured: true,
-    options: [
-      {
-        name: "Processor",
-        values: ["M1 Pro (8-core CPU)", "M1 Pro (10-core CPU)", "M1 Max (10-core CPU)"],
-      },
-      {
-        name: "Memory",
-        values: ["16GB", "32GB", "64GB"],
-      },
-      {
-        name: "Storage",
-        values: ["512GB", "1TB", "2TB", "4TB", "8TB"],
-      },
-    ],
-  },
-  {
-    id: "prod4",
-    slug: "sony-wh-1000xm4",
-    name: "Sony WH-1000XM4 Wireless Noise Cancelling Headphones",
-    description:
-      "Industry-leading noise cancellation with Dual Noise Sensor technology, up to 30-hour battery life, and touch sensor controls for an exceptional listening experience.",
-    category: "audio-headphones",
-    brand: "sony",
-    pricePKR: 59999,
-    discountPercentage: 15,
-    rating: 4.8,
-    reviewCount: 203,
-    imageUrls: [
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-      "/placeholder.svg?height=600&width=600",
-    ],
-    stock: 20,
-    sku: "SONWH1000XM4",
-    specifications: {
-      type: "Over-ear, Wireless",
-      driver: "40mm, dome type (CCAW Voice coil)",
-      frequency: "4Hz-40,000Hz",
-      battery: "Up to 30 hours",
-      charging: "USB Type-C",
-      weight: "254g",
-      features: "Active Noise Cancellation, Speak-to-Chat, Wearing Detection, Adaptive Sound Control",
-    },
-    createdAt: "2023-01-20T09:45:00Z",
-    isFeatured: true,
-    options: [
-      {
-        name: "Color",
-        values: ["Black", "Silver", "Midnight Blue"],
-      },
-    ],
-  },
-  {
-    id: "prod5",
-    slug: "anker-powercore-20000",
-    name: "Anker PowerCore 20000mAh Power Bank",
-    description:
-      "High-capacity 20000mAh power bank with PowerIQ and VoltageBoost technology for fast charging of smartphones, tablets, and other USB devices.",
-    category: "cables-chargers",
-    brand: "anker",
-    pricePKR: 7999,
-    discountPercentage: 20,
-    rating: 4.6,
-    reviewCount: 312,
-    imageUrls: ["/placeholder.svg?height=600&width=600", "/placeholder.svg?height=600&width=600"],
-    stock: 35,
-    sku: "ANKPB20K",
-    specifications: {
-      capacity: "20000mAh",
-      input: "5V/2A",
-      output: "2 USB-A ports (5V/3A each)",
-      charging: "Micro USB",
-      dimensions: "166 x 62 x 22 mm",
-      weight: "356g",
-      features: "PowerIQ, VoltageBoost, MultiProtect Safety System",
-    },
-    createdAt: "2023-02-15T11:20:00Z",
-    isFeatured: false,
-    options: [
-      {
-        name: "Color",
-        values: ["Black", "White"],
-      },
-    ],
-  },
-  // Add more products as needed
-]
-
-// API functions
+// API functions that now use real API calls
 export async function getCategories(): Promise<Category[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 100))
   return categories
 }
 
 export async function getBrands(): Promise<Brand[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 100))
   return brands
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 100))
   return categories.find((category) => category.slug === slug)
 }
 
@@ -352,110 +142,112 @@ export async function getProducts(filters?: {
   page?: number
   limit?: number
 }): Promise<{ products: Product[]; total: number }> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300))
+  try {
+    const params = new URLSearchParams()
 
-  let filteredProducts = [...products]
-
-  // Apply filters
-  if (filters) {
-    if (filters.category) {
-      filteredProducts = filteredProducts.filter((p) => p.category === filters.category)
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, value.toString())
+        }
+      })
     }
 
-    if (filters.brand) {
-      filteredProducts = filteredProducts.filter((p) => p.brand === filters.brand)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/products?${params}`, {
+      cache: "no-store", // Always fetch fresh data
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch products")
     }
 
-    if (filters.minPrice !== undefined) {
-      filteredProducts = filteredProducts.filter((p) => p.pricePKR >= filters.minPrice!)
-    }
-
-    if (filters.maxPrice !== undefined) {
-      filteredProducts = filteredProducts.filter((p) => p.pricePKR <= filters.maxPrice!)
-    }
-
-    if (filters.rating !== undefined) {
-      filteredProducts = filteredProducts.filter((p) => p.rating >= filters.rating!)
-    }
-
-    if (filters.inStock) {
-      filteredProducts = filteredProducts.filter((p) => p.stock > 0)
-    }
-
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase()
-      filteredProducts = filteredProducts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchLower) ||
-          p.description.toLowerCase().includes(searchLower) ||
-          p.brand.toLowerCase().includes(searchLower) ||
-          p.category.toLowerCase().includes(searchLower),
-      )
-    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching products:", error)
+    return { products: [], total: 0 }
   }
-
-  // Get total count before pagination
-  const total = filteredProducts.length
-
-  // Apply pagination
-  const page = filters?.page || 1
-  const limit = filters?.limit || 12
-  const start = (page - 1) * limit
-  const end = start + limit
-
-  filteredProducts = filteredProducts.slice(start, end)
-
-  return { products: filteredProducts, total }
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-  return products.find((product) => product.slug === slug)
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/products/${slug}`, {
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      return undefined
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching product:", error)
+    return undefined
+  }
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-  return products.filter((product) => product.isFeatured)
+  try {
+    const { products } = await getProducts({ limit: 100 })
+    return products.filter((product) => product.isFeatured)
+  } catch (error) {
+    console.error("Error fetching featured products:", error)
+    return []
+  }
 }
 
 export async function getNewArrivals(limit = 6): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-
-  // Sort by createdAt (newest first) and take the first 'limit' products
-  return [...products].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
+  try {
+    const { products } = await getProducts({ limit: 100 })
+    return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
+  } catch (error) {
+    console.error("Error fetching new arrivals:", error)
+    return []
+  }
 }
 
 export async function getRelatedProducts(productId: string, category: string, limit = 4): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-
-  // Get products in the same category, excluding the current product
-  return products.filter((p) => p.category === category && p.id !== productId).slice(0, limit)
+  try {
+    const { products } = await getProducts({ category, limit: 100 })
+    return products.filter((p) => p.id !== productId).slice(0, limit)
+  } catch (error) {
+    console.error("Error fetching related products:", error)
+    return []
+  }
 }
 
 export async function searchProducts(query: string, limit = 10): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 150))
-
-  if (!query.trim()) {
+  try {
+    const { products } = await getProducts({ search: query, limit })
+    return products
+  } catch (error) {
+    console.error("Error searching products:", error)
     return []
   }
+}
 
-  const searchLower = query.toLowerCase()
+export async function createProduct(
+  productData: any,
+): Promise<{ success: boolean; product?: Product; error?: string }> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    })
 
-  return products
-    .filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.description.toLowerCase().includes(searchLower) ||
-        p.brand.toLowerCase().includes(searchLower) ||
-        p.category.toLowerCase().includes(searchLower),
-    )
-    .slice(0, limit)
+    const result = await response.json()
+
+    if (!response.ok) {
+      throw new Error(result.error || "Failed to create product")
+    }
+
+    return result
+  } catch (error) {
+    console.error("Error creating product:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
 }
 
 export async function createOrder(orderData: {
@@ -474,15 +266,10 @@ export async function createOrder(orderData: {
   const shipping = subtotal >= 3000 ? 0 : 250
   const total = (subtotal + shipping).toString()
 
-  // In a real app, you would save the order to a database here
-
   return { id: orderId, total }
 }
 
 export async function getProductReviews(productId: string): Promise<Review[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 200))
-
   // Mock reviews
   const reviews: Review[] = [
     {

@@ -9,11 +9,13 @@ import { formatCurrency } from "@/lib/utils"
 export default function ConfirmationPage() {
   const [orderId, setOrderId] = useState<string | null>(null)
   const [orderTotal, setOrderTotal] = useState<string | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null)
 
   useEffect(() => {
     // Get order details from localStorage
     const savedOrderId = localStorage.getItem("orderId")
     const savedOrderTotal = localStorage.getItem("orderTotal")
+    const savedPaymentInfo = localStorage.getItem("paymentInfo")
 
     if (savedOrderId) {
       setOrderId(savedOrderId)
@@ -21,6 +23,15 @@ export default function ConfirmationPage() {
 
     if (savedOrderTotal) {
       setOrderTotal(savedOrderTotal)
+    }
+
+    if (savedPaymentInfo) {
+      try {
+        const paymentInfo = JSON.parse(savedPaymentInfo)
+        setPaymentMethod(paymentInfo.method)
+      } catch (error) {
+        console.error("Error parsing payment info:", error)
+      }
     }
 
     // Clear checkout data
@@ -36,6 +47,26 @@ export default function ConfirmationPage() {
     month: "long",
     day: "numeric",
   }).format(deliveryDate)
+
+  // Helper function to get payment method display name
+  const getPaymentMethodName = (method: string | null) => {
+    if (!method) return "Not specified"
+
+    switch (method) {
+      case "card":
+        return "Credit/Debit Card"
+      case "cod":
+        return "Cash on Delivery"
+      case "easypaisa":
+        return "EasyPaisa"
+      case "jazzcash":
+        return "JazzCash"
+      case "stripe":
+        return "Stripe"
+      default:
+        return method
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -61,6 +92,11 @@ export default function ConfirmationPage() {
             </div>
           )}
 
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">Payment Method</p>
+            <p className="text-lg font-medium">{getPaymentMethodName(paymentMethod)}</p>
+          </div>
+
           <div>
             <p className="text-sm text-muted-foreground">Expected Delivery</p>
             <p className="text-lg font-medium">{formattedDeliveryDate}</p>
@@ -69,6 +105,7 @@ export default function ConfirmationPage() {
 
         <p className="mb-8">
           We have sent a confirmation email to your registered email address with all the order details.
+          {paymentMethod === "cod" && " Please have the exact amount ready for the delivery person."}
         </p>
 
         <Button asChild size="lg">

@@ -7,28 +7,33 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/lib/cart-context"
 import CheckoutProgress from "@/components/checkout/CheckoutProgress"
+import CreditCardForm from "@/components/checkout/payment-methods/CreditCardForm"
+import EasyPaisaForm from "@/components/checkout/payment-methods/EasyPaisaForm"
+import JazzCashForm from "@/components/checkout/payment-methods/JazzCashForm"
+import StripePaymentForm from "@/components/checkout/payment-methods/StripePaymentForm"
+import type { PaymentDetails, PaymentMethod } from "@/lib/payment-service"
+import { CreditCard, Banknote, Wallet, StickerIcon as StripeIcon } from "lucide-react"
 
 const formSchema = z.object({
-  paymentMethod: z.enum(["card", "cod"], {
+  paymentMethod: z.enum(["card", "cod", "easypaisa", "jazzcash", "stripe"], {
     required_error: "Please select a payment method",
   }),
-  cardNumber: z.string().optional(),
-  cardExpiry: z.string().optional(),
-  cardCvc: z.string().optional(),
   sameAsBilling: z.boolean().default(true),
 })
 
 export default function PaymentPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { items } = useCart()
+  const { items, getTotal } = useCart()
   const [shippingInfo, setShippingInfo] = useState<any>(null)
+  const [paymentDetails, setPaymentDetails] = useState<Partial<PaymentDetails>>({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [orderId, setOrderId] = useState<string>(`ORD-${Date.now()}`)
 
   useEffect(() => {
     // Get shipping info from localStorage
@@ -45,25 +50,50 @@ export default function PaymentPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       paymentMethod: "card",
-      cardNumber: "",
-      cardExpiry: "",
-      cardCvc: "",
       sameAsBilling: true,
     },
   })
 
-  const watchPaymentMethod = form.watch("paymentMethod")
+  const watchPaymentMethod = form.watch("paymentMethod") as PaymentMethod
+
+  function handlePaymentDetailsChange(details: Partial<PaymentDetails>) {
+    setPaymentDetails((prev) => ({ ...prev, ...details }))
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you would process payment or save COD preference
-    localStorage.setItem("paymentInfo", JSON.stringify(values))
+    setIsLoading(true)
 
-    toast({
-      title: "Payment information saved",
-      description: "Your payment details have been saved successfully.",
-    })
+    try {
+      // In a real app, you would process payment or save payment preference
+      const paymentInfo = {
+        method: values.paymentMethod,
+        ...paymentDetails,
+        sameAsBilling: values.sameAsBilling,
+      }
 
-    router.push("/checkout/review")
+      localStorage.setItem("paymentInfo", JSON.stringify(paymentInfo))
+
+      // For Stripe, we don't redirect yet as the user will be redirected to Stripe's checkout
+      if (values.paymentMethod === "stripe") {
+        setIsLoading(false)
+        return
+      }
+
+      toast({
+        title: "Payment information saved",
+        description: "Your payment details have been saved successfully.",
+      })
+
+      router.push("/checkout/review")
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an error saving your payment information.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Redirect if cart is empty
@@ -102,19 +132,46 @@ export default function PaymentPage() {
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="flex flex-col space-y-1"
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
                     >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem className="flex flex-col items-center space-y-3 rounded-md border p-4 cursor-pointer hover:bg-muted">
                         <FormControl>
-                          <RadioGroupItem value="card" />
+                          <RadioGroupItem value="card" className="sr-only" />
                         </FormControl>
-                        <FormLabel className="font-normal">Credit / Debit Card</FormLabel>
+                        <CreditCard className="h-6 w-6" />
+                        <FormLabel className="font-normal cursor-pointer">Credit / Debit Card</FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+
+                      <FormItem className="flex flex-col items-center space-y-3 rounded-md border p-4 cursor-pointer hover:bg-muted">
                         <FormControl>
-                          <RadioGroupItem value="cod" />
+                          <RadioGroupItem value="stripe" className="sr-only" />
                         </FormControl>
-                        <FormLabel className="font-normal">Cash on Delivery</FormLabel>
+                        <StripeIcon className="h-6 w-6" />
+                        <FormLabel className="font-normal cursor-pointer">Stripe</FormLabel>
+                      </FormItem>
+
+                      <FormItem className="flex flex-col items-center space-y-3 rounded-md border p-4 cursor-pointer hover:bg-muted">
+                        <FormControl>
+                          <RadioGroupItem value="easypaisa" className="sr-only" />
+                        </FormControl>
+                        <Wallet className="h-6 w-6 text-green-600" />
+                        <FormLabel className="font-normal cursor-pointer">EasyPaisa</FormLabel>
+                      </FormItem>
+
+                      <FormItem className="flex flex-col items-center space-y-3 rounded-md border p-4 cursor-pointer hover:bg-muted">
+                        <FormControl>
+                          <RadioGroupItem value="jazzcash" className="sr-only" />
+                        </FormControl>
+                        <Wallet className="h-6 w-6 text-red-600" />
+                        <FormLabel className="font-normal cursor-pointer">JazzCash</FormLabel>
+                      </FormItem>
+
+                      <FormItem className="flex flex-col items-center space-y-3 rounded-md border p-4 cursor-pointer hover:bg-muted md:col-span-2">
+                        <FormControl>
+                          <RadioGroupItem value="cod" className="sr-only" />
+                        </FormControl>
+                        <Banknote className="h-6 w-6" />
+                        <FormLabel className="font-normal cursor-pointer">Cash on Delivery</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -124,50 +181,35 @@ export default function PaymentPage() {
             />
 
             {watchPaymentMethod === "card" && (
-              <div className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="cardNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Card Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="4242 4242 4242 4242" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="bg-muted p-6 rounded-lg">
+                <CreditCardForm onDataChange={handlePaymentDetailsChange} />
+              </div>
+            )}
 
-                <div className="grid grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="cardExpiry"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Expiry Date</FormLabel>
-                        <FormControl>
-                          <Input placeholder="MM/YY" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            {watchPaymentMethod === "easypaisa" && (
+              <div className="bg-muted p-6 rounded-lg">
+                <EasyPaisaForm onDataChange={handlePaymentDetailsChange} amount={getTotal()} orderId={orderId} />
+              </div>
+            )}
 
-                  <FormField
-                    control={form.control}
-                    name="cardCvc"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>CVC</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+            {watchPaymentMethod === "jazzcash" && (
+              <div className="bg-muted p-6 rounded-lg">
+                <JazzCashForm onDataChange={handlePaymentDetailsChange} amount={getTotal()} orderId={orderId} />
+              </div>
+            )}
+
+            {watchPaymentMethod === "stripe" && (
+              <div className="bg-muted p-6 rounded-lg">
+                <StripePaymentForm email={shippingInfo.email} orderId={orderId} />
+              </div>
+            )}
+
+            {watchPaymentMethod === "cod" && (
+              <div className="bg-muted p-6 rounded-lg">
+                <p className="text-center mb-4">You will pay when your order is delivered.</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  Please have the exact amount ready to ensure a smooth delivery process.
+                </p>
               </div>
             )}
 
@@ -187,8 +229,8 @@ export default function PaymentPage() {
             />
 
             <div className="pt-4">
-              <Button type="submit" className="w-full">
-                Review Order
+              <Button type="submit" className="w-full" disabled={isLoading || watchPaymentMethod === "stripe"}>
+                {isLoading ? "Processing..." : "Review Order"}
               </Button>
             </div>
           </form>

@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react"
 import AccountOrders from "@/components/account/AccountOrders"
 import AccountAddresses from "@/components/account/AccountAddresses"
 import AccountSettings from "@/components/account/AccountSettings"
+import Link from "next/link"
 
 export default function AccountPage() {
   const { data: session, status } = useSession()
@@ -71,13 +72,27 @@ export default function AccountPage() {
 
         <div className="md:w-2/3">
           <Tabs defaultValue="orders">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="wishlist">Wishlist</TabsTrigger>
               <TabsTrigger value="addresses">Addresses</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
             <TabsContent value="orders">
               <AccountOrders />
+            </TabsContent>
+            <TabsContent value="wishlist">
+              <Card>
+                <CardHeader>
+                  <CardTitle>My Wishlist</CardTitle>
+                  <CardDescription>Items you've saved for later</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild>
+                    <Link href="/account/wishlist">View Full Wishlist</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </TabsContent>
             <TabsContent value="addresses">
               <AccountAddresses />

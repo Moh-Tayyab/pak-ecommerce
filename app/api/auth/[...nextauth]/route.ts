@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import FacebookProvider from "next-auth/providers/facebook"
-import TwitterProvider from "next-auth/providers/twitter"
+//import TwitterProvider from "next-auth/providers/twitter"
 
 const handler = NextAuth({
   providers: [
@@ -13,11 +13,11 @@ const handler = NextAuth({
       clientId: process.env.FACEBOOK_CLIENT_ID || "",
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
     }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID || "",
-      clientSecret: process.env.TWITTER_CLIENT_SECRET || "",
-      version: "2.0", // Use OAuth 2.0
-    }),
+    // TwitterProvider({
+    //   clientId: process.env.TWITTER_CLIENT_ID || "",
+    //   clientSecret: process.env.TWITTER_CLIENT_SECRET || "",
+    //   version: "2.0", // Use OAuth 2.0
+    // }),
   ],
   pages: {
     signIn: "/auth/signin",
